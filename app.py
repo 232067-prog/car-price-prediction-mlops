@@ -1,4 +1,5 @@
 from pathlib import Path
+from datetime import date
 
 import joblib
 import pandas as pd
@@ -9,6 +10,8 @@ MODEL_DIR = BASE_DIR / "model"
 
 app = Flask(__name__)
 app.config["JSON_SORT_KEYS"] = False
+
+CURRENT_YEAR = date.today().year
 
 MODEL = None
 LABEL_ENCODERS = {}
@@ -109,12 +112,12 @@ def encode_category(value, encoder):
 
 
 def build_feature_row(payload):
-    year = int(payload.get("year", 2024))
+    year = int(payload.get("year", CURRENT_YEAR))
     computed_age = payload.get("car_age")
     if computed_age is None or computed_age == "":
-        computed_age = max(0, 2024 - year)
+        computed_age = max(0, CURRENT_YEAR - year)
 
-    row = {"year": year, "car_age": int(safe_float(computed_age, default=max(0, 2024 - year)))}
+    row = {"year": year, "car_age": int(safe_float(computed_age, default=max(0, CURRENT_YEAR - year)))}
     for field in REQUIRED_FIELDS:
         if field not in row:
             row[field] = payload.get(field, "")
@@ -151,6 +154,18 @@ def index():
     return render_template("index.html")
 
 
+@app.route("/health", methods=["GET"])
+def health_check():
+    status = "ok" if app.config.get("ARTIFACTS_LOADED") else "degraded"
+    return jsonify(
+        {
+            "status": status,
+            "artifacts_loaded": bool(app.config.get("ARTIFACTS_LOADED")),
+            "year_context": CURRENT_YEAR,
+        }
+    )
+
+
 @app.route("/predict", methods=["POST"])
 def predict():
     if not app.config.get("ARTIFACTS_LOADED"):
@@ -164,15 +179,15 @@ def predict():
     if missing:
         return jsonify({"error": "Missing required fields: " + ", ".join(missing)}), 400
 
-    year = safe_float(payload.get("year"), default=2024)
+    year = safe_float(payload.get("year"), default=CURRENT_YEAR)
     if year <= 0:
         return jsonify({"error": "Year must be a positive number."}), 400
 
     computed_age = payload.get("car_age")
     if computed_age is None or computed_age == "":
-        computed_age = max(0, 2024 - int(year))
+        computed_age = max(0, CURRENT_YEAR - int(year))
     else:
-        computed_age = max(0, int(safe_float(computed_age, default=max(0, 2024 - int(year)))))
+        computed_age = max(0, int(safe_float(computed_age, default=max(0, CURRENT_YEAR - int(year)))))
 
     payload["car_age"] = computed_age
 
