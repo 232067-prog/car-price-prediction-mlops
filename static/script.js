@@ -1,6 +1,7 @@
 const form = document.getElementById('car-form');
 const predictedPrice = document.getElementById('predicted-price');
 const statusMessage = document.getElementById('status-message');
+const submitButton = form.querySelector('button[type="submit"]');
 const currentYear = new Date().getFullYear();
 
 const formatter = new Intl.NumberFormat('en-US', {
@@ -24,6 +25,8 @@ form.addEventListener('submit', async (event) => {
   payload.odometer = Number(payload.odometer);
   payload.car_age = Math.max(0, currentYear - payload.year);
 
+  submitButton.disabled = true;
+  submitButton.textContent = 'Predicting...';
   statusMessage.textContent = 'Generating estimate...';
 
   try {
@@ -35,7 +38,7 @@ form.addEventListener('submit', async (event) => {
       body: JSON.stringify(payload),
     });
 
-    const data = await response.json();
+    const data = await response.json().catch(() => ({}));
 
     if (!response.ok) {
       throw new Error(data.error || 'Prediction failed.');
@@ -46,5 +49,8 @@ form.addEventListener('submit', async (event) => {
   } catch (error) {
     statusMessage.textContent = error.message || 'Unable to generate a price estimate.';
     predictedPrice.textContent = '$0';
+  } finally {
+    submitButton.disabled = false;
+    submitButton.textContent = 'Predict Price';
   }
 });
