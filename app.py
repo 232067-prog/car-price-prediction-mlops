@@ -90,6 +90,14 @@ def safe_float(value, default=0.0):
         return float(default)
 
 
+def validate_range(field_name, value, min_value=None, max_value=None):
+    if min_value is not None and value < min_value:
+        return f"{field_name} must be at least {min_value}."
+    if max_value is not None and value > max_value:
+        return f"{field_name} must be at most {max_value}."
+    return None
+
+
 def encode_category(value, encoder):
     if encoder is None:
         return 0
@@ -180,8 +188,19 @@ def predict():
         return jsonify({"error": "Missing required fields: " + ", ".join(missing)}), 400
 
     year = safe_float(payload.get("year"), default=CURRENT_YEAR)
-    if year <= 0:
-        return jsonify({"error": "Year must be a positive number."}), 400
+    year_error = validate_range("Year", year, min_value=1886, max_value=CURRENT_YEAR + 1)
+    if year_error:
+        return jsonify({"error": year_error}), 400
+
+    cylinders = safe_float(payload.get("cylinders"), default=0)
+    cylinders_error = validate_range("Cylinders", cylinders, min_value=1, max_value=24)
+    if cylinders_error:
+        return jsonify({"error": cylinders_error}), 400
+
+    odometer = safe_float(payload.get("odometer"), default=0)
+    odometer_error = validate_range("Odometer", odometer, min_value=0, max_value=2_000_000)
+    if odometer_error:
+        return jsonify({"error": odometer_error}), 400
 
     computed_age = payload.get("car_age")
     if computed_age is None or computed_age == "":
