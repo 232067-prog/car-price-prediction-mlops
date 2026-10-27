@@ -29,12 +29,12 @@
 
               <label>
                 <span>Manufacturer</span>
-                <input type="text" id="manufacturer" name="manufacturer" value="ford" required />
+                <input type="text" id="manufacturer" name="manufacturer" value="ford" autocomplete="off" required />
               </label>
 
               <label>
                 <span>Model</span>
-                <input type="text" id="model" name="model" value="focus" required />
+                <input type="text" id="model" name="model" value="focus" autocomplete="off" required />
               </label>
 
               <label>
@@ -135,9 +135,11 @@
 
               <label>
                 <span>State</span>
-                <input type="text" id="state" name="state" value="ca" required />
+                <input type="text" id="state" name="state" value="ca" minlength="2" maxlength="2" autocomplete="off" required />
               </label>
             </div>
+
+            <p class="form-note">Tip: Use two-letter state codes like <strong>ca</strong>, <strong>tx</strong>, or <strong>ny</strong>.</p>
 
             <button type="submit" class="primary-button">Predict Price</button>
           </form>
