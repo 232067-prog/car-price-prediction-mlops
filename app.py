@@ -98,11 +98,17 @@ def validate_range(field_name, value, min_value=None, max_value=None):
     return None
 
 
+def normalize_text(value):
+    if value is None:
+        return ""
+    return str(value).strip().lower()
+
+
 def encode_category(value, encoder):
     if encoder is None:
         return 0
 
-    raw_value = "" if value is None else str(value).strip()
+    raw_value = normalize_text(value)
     if raw_value == "":
         return 0
 
@@ -129,6 +135,10 @@ def build_feature_row(payload):
     for field in REQUIRED_FIELDS:
         if field not in row:
             row[field] = payload.get(field, "")
+
+    for field in CATEGORICAL_FIELDS:
+        if field in row:
+            row[field] = normalize_text(row[field])
 
     for field in ["year", "cylinders", "odometer", "car_age"]:
         if field in row:
