@@ -32,6 +32,8 @@ jobs:
 
       - name: Setup GitHub Pages
         uses: actions/configure-pages@v5
+        with:
+          enablement: true
 
       - name: Build static site for GitHub Pages
         run: python build_pages.py
