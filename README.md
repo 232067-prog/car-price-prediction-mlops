@@ -1,3 +1,7 @@
+Name: Muhammad Haris Shahzad
+Reg Id: 232067
+Sec A
+
 # Car Price Prediction App
 
 This project provides a simple Flask web app for predicting a vehicle price from car details.
