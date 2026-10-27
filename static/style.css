@@ -130,6 +130,18 @@ select:focus {
   transform: translateY(-1px);
 }
 
+.primary-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.75;
+  transform: none;
+}
+
+.form-note {
+  margin: 16px 0 0;
+  font-size: 0.88rem;
+  color: var(--muted);
+}
+
 .result-card {
   padding: 28px 24px;
   background: linear-gradient(180deg, var(--panel-alt) 0%, #f7f9ff 100%);
