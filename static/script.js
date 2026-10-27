@@ -1,6 +1,7 @@
 const form = document.getElementById('car-form');
 const predictedPrice = document.getElementById('predicted-price');
 const statusMessage = document.getElementById('status-message');
+const currentYear = new Date().getFullYear();
 
 const formatter = new Intl.NumberFormat('en-US', {
   style: 'currency',
@@ -14,10 +15,14 @@ form.addEventListener('submit', async (event) => {
   const formData = new FormData(form);
   const payload = Object.fromEntries(formData.entries());
 
+  payload.manufacturer = String(payload.manufacturer || '').trim().toLowerCase();
+  payload.model = String(payload.model || '').trim().toLowerCase();
+  payload.state = String(payload.state || '').trim().toLowerCase();
+
   payload.year = Number(payload.year);
   payload.cylinders = Number(payload.cylinders);
   payload.odometer = Number(payload.odometer);
-  payload.car_age = 2024 - payload.year;
+  payload.car_age = Math.max(0, currentYear - payload.year);
 
   statusMessage.textContent = 'Generating estimate...';
 
